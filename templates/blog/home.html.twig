@@ -1,0 +1,27 @@
+{% extends "base.html.twig" %}
+{# On hérite du template de base 'base.html.twig' #}
+
+{# On fait appel au block 'body' du fichier 'base.html.twig' #}
+
+{% block body %}
+    <h1 class="display-4 text-center my-4">{{ title }}</h1>
+    {# {{ }} -> Double accolade, ce que l'on appel l'interpolation  #} 
+    {# {% %} -> commande TWIG #}
+
+    {% if age > 18 %}
+
+        <p> Tu es majeur !</p>
+
+    {% else %}
+
+        <p> Tu es mineur</p>
+
+    {% endif %}
+
+    Qu'est-ce que Lorem Ipsum?
+    <br>
+    Lorem Ipsum est simplement un texte factice de l'industrie de l'impression et de la composition. Lorem Ipsum est le texte factice standard de l'industrie depuis les années 1500, quand un imprimeur inconnu a pris une galère de caractères et l'a brouillée pour en faire un livre de spécimens. 
+    Il a survécu non seulement cinq siècles, mais aussi le saut dans la composition électronique, demeurant essentiellement inchangé. Il a été popularisé dans les années 1960 avec la sortie de feuilles Letraset contenant des passages du Lorem Ipsum, et plus récemment avec un logiciel de publication assistée par ordinateur comme Aldus PageMaker comprenant des versions de Lorem Ipsum.
+
+
+{% endblock %}
