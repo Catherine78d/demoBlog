@@ -5,25 +5,20 @@
 
 {% block body %}
 
-<h1 class="display-4 text-center my-4"> Détail de l'article</h1>
+{#  "article" est une variable TWIG qui provient du controller et qui contient le détail d'un article selectionné en BDD #}
+<h1 class="display-4 text-center my-4"> {{ article.title }}</h1>
 
     <div class="col-md-12">
         <div class="card mb-4 shadow-sm">
-            <img src="https://picsum.photos/1000/400" alt="">
+            {#  replace() : filtre TWIG permettant de remplacer la hauteur/largeur dans l'URL de l'image #}
+            <img src="{{ article.image|replace({'200/300' : '1000/300'}) }}" alt="">
             <div class="card-body">
-                <p class="card-text">Qu'est-ce que Lorem Ipsum?
-                <br>Lorem Ipsum est simplement un texte factice de l'industrie de l'impression et de la composition. Lorem Ipsum est le texte factice standard de l'industrie depuis les années 1500, quand un imprimeur inconnu a pris une galère de caractères et l'a brouillée pour en faire un livre de spécimens. Il a survécu non seulement cinq siècles, mais aussi le saut dans la composition électronique, demeurant essentiellement inchangé. Il a été popularisé dans les années 1960 avec la sortie de feuilles Letraset contenant des passages du Lorem Ipsum, et plus récemment avec un logiciel de publication assistée par ordinateur comme Aldus PageMaker comprenant des versions de Lorem Ipsum.</p>
-
-                <p class="card-text">Pourquoi l'utilisons-nous?
-                <br>C'est un fait établi depuis longtemps qu'un lecteur sera distrait par le contenu lisible d'une page lorsqu'il regarde sa mise en page. L'intérêt d'utiliser Lorem Ipsum est qu'il a une distribution plus ou moins normale des lettres, par opposition à l'utilisation de «Contenu ici, contenu ici», ce qui le fait ressembler à un anglais lisible. De nombreux progiciels de publication assistée par ordinateur et éditeurs de pages Web utilisent désormais Lorem Ipsum comme modèle de texte par défaut, et une recherche sur «lorem ipsum» permettra de découvrir de nombreux sites Web encore à leurs balbutiements. Différentes versions ont évolué au fil des années, parfois par accident, parfois exprès (humour injecté, etc.).</p>
-
-                <p class="card-text">Pourquoi l'utilisons-nous?
-                <br>C'est un fait établi depuis longtemps qu'un lecteur sera distrait par le contenu lisible d'une page lorsqu'il regarde sa mise en page. L'intérêt d'utiliser Lorem Ipsum est qu'il a une distribution plus ou moins normale des lettres, par opposition à l'utilisation de «Contenu ici, contenu ici», ce qui le fait ressembler à un anglais lisible. De nombreux progiciels de publication assistée par ordinateur et éditeurs de pages Web utilisent désormais Lorem Ipsum comme modèle de texte par défaut, et une recherche sur «lorem ipsum» permettra de découvrir de nombreux sites Web encore à leurs balbutiements. Différentes versions ont évolué au fil des années, parfois par accident, parfois exprès (humour injecté, etc.).</p>
+                <p class="card-text"> {{ article.content|raw }} </p>
             </div>
-            <div class="d-flex justify-content-between align-items-center">
-                <small class="text-muted">9 mins</small>
+            <small class="text-muted ml-2 mb-2">publié le {{ article.createdAt|date('d/m/Y') }} à {{ article.createdAt|date('H:i:s') }}</small>
             </div>
         </div>
+
     </div>
 
 
