@@ -16,6 +16,7 @@
                 <p class="card-text"> {{ article.content|raw }} </p>
             </div>
             <small class="text-muted ml-2 mb-2">publié le {{ article.createdAt|date('d/m/Y') }} à {{ article.createdAt|date('H:i:s') }}</small>
+            <small> <a href="{{ path('blog_edit', {'id': article.id }) }}" class="btn btn-dark ml-2 mb-2">EDIT</a></small> 
             </div>
         </div>
 
