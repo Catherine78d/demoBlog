@@ -3,11 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Form\ArticleType;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TexteraType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class BlogController extends AbstractController
@@ -49,33 +52,91 @@ class BlogController extends AbstractController
 
     /**
      * @Route("/blog/new", name="blog_create")
+     * @Route("/blog/{id}/edit", name="blog_edit")
      */
-    public function create(Request $request, EntityManagerInterface $manager)
+    public function form(Article $article = null, Request $request, EntityManagerInterface $manager)
     {
+        // Nous avons définit 2 routes différentes, une pour l'insertion et une pour la modification
+        // Lorsque l'on envoie la route '/blog/new' dans l'URL, on définit un Article $article NULL, sinon Symfony tente de récupérer un article en BDD et nous avons une erreur
+        // Lorsque l'on envoie la route '/blog/{id}/edit', Symfony selectionne en BDD l'article en fonction de l'ID transmit dans l'URL et écrase NULL par l'article recupéré en BDD dans l'objet $article
+
+
         // La classe Request contient toute les données véhiculées par les supergloables ($_POST, $_GET, $_FILES etc...)
+        // dump($request); // on observe les données saisi dans le formulaire dans la propriété 'request'
+
+        // Méthode 1 - Mis en commentaire - Lié au formulaire de create.html.twig dans templates/blog
+        // Si des données ont bien été saisie dans le formulaire
+        // if($request->request->count() > 0)
+        // {
+        //     // Pour pouvoir insérer un article dans la BDD, nous devons passer par l'entité Article et remplir tout les setteurs de l'objet
+        //     $article = new Article;
+        //     $article->setTitle($request->request->get('title'))
+        //             ->setContent($request->request->get('content'))
+        //             ->setImage($request->request->get('image'))
+        //             ->setCreatedAt(new \DateTime());
+
+        //     $manager->persist($article); // On prépare la requete d'insertion
+        //     $manager->flush(); // on execute la requete d'insertion
+
+        //     // redirectToRoute permet de rediriger vers le detail de l'article après insertion
+        //     // 2 arguments : La route et le paramètre attendu dans la route (ID)
+        //     return $this->redirectToRoute('blog_show', [
+        //         'id' => $article->getId()
+        //     ]);
+        // }
+        // Fin méthode 1
+
+
+        // On entre dans la condition IF seulement dans le cas de la création d'un nouvel article, c'est à dire pour la route 'blog/new', $article est NULL, on crée un nouvel objet Article
+        // Dans le cas d'une modification, $article n'est pas null, il contient l'article selctionné en BDD à modifier, on entre pas dans la condition IF
+        if (!$article) {
+            $article = new Article;
+        }
+
+        // On observe quand remplissant l'objet Article via les setters, les getters renvoient les données de l'article directement dans les champs du formulaire
+        //$article->setTitle("Titre à la c")
+        //        ->setContent("contenu à la c");
+
+        // createFormBuilder() : méthode issue de la classe BlogController permettant de créer un formulaire HTML qui sera lié à notre objet Article, c'est à dire que les champs du formulaire vont remplir l'objet Article
+        /* Remplacé par DataFixtures/Form
+        $form = $this->createFormBuilder($article)
+            ->add('title')
+
+            ->add('content')
+
+            ->add('image')
+
+            ->getForm(); // permet de valider le formulaire
+        */
+
+        // On importe la classe ArticleType qui permet de générer le formulaire d'ajout / modification des articles
+        // On précise que le formulaire a pour but de remplir les setteurs de l'objet $article
+        $form = $this->createForm(ArticleType::class, $article);
+        
+        $form->handleRequest($request);   // handleRequest permet de vérifier si tout les champs ont bien été remplit et la méthode va bindé l'objet Article, c'est à dire que si un titre de l'article a été saisi, il sera envoyé directement dans le bon setter de l'objet Article
+
         dump($request); // on observe les données saisi dans le formulaire dans la propriété 'request'
 
-        // Si des données ont bien été saisie dans le formulaire
-        if($request->request->count() > 0)
+        // Si le formulaire a bien été soumit et que toutes les données sont valides, alors on entre dans la condition IF
+        if($form->isSubmitted() && $form->isValid())  // 
         {
-            // Pour pouvoir insérer un article dans la BDD, nous devons passer par l'entité Article et remplir tout les setteurs de l'objet
-            $article = new Article;
-            $article->setTitle($request->request->get('title'))
-                    ->setContent($request->request->get('content'))
-                    ->setImage($request->request->get('image'))
-                    ->setCreatedAt(new \DateTime());
+            if(!$article->getId())
+            {
+                $article->setCreatedAt(new \DateTime());  // on remplit le setter de la date pisque nous n'avons pas de champ date dans le formulaire
+            }
+            $manager->persist($article);  // on prépare l'insertion
+            $manager->flush();  // On execute l'insertion en BDD
 
-            $manager->persist($article); // On prépare la requete d'insertion
-            $manager->flush(); // on execute la requete d'insertion
-
-            // redirectToRoute permet de rediriger vers le detail de l'article après insertion
-            // 2 arguments : La route et le paramètre attendu dans la route (ID)
+            // Une fois l'insertion éxecutée, on redirige vers le détail de l'article qui vient d'être inséré
             return $this->redirectToRoute('blog_show', [
-                'id' => $article->getId()
+                        'id' => $article->getId()   // On transmet dans la route l'ID de l'article qui vient d'être inséré grace au getter de l'objet Article
             ]);
         }
 
-        return $this->render('blog/create.html.twig');
+        return $this->render('blog/create.html.twig', [
+            'formArticle' => $form->createView(),
+            'editMode' => $article->getId() !== null   //Si l'article est différent de NULL, alors 'editMode' renvoie TRUE et que c'est une modification
+        ]);
     }
 
     
