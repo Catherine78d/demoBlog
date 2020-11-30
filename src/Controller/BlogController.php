@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\Comment;
 use App\Form\ArticleType;
+use App\Form\CommentType;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -140,25 +142,55 @@ class BlogController extends AbstractController
     }
 
     
-    /*
-        Nous utilisons le concept de route paramétrées pour faire en sorte de récupérer le bon ID du bon article
-        Nous avons définit le paramètre de type {id} directement dans la route
-    */
+    // Nous utilisons le concept de route paramétrées pour faire en sorte de récupérer le bon ID du bon article
+    // Nous avons définit le paramètre de type {id} directement dans la route
 
     /**
      * @Route("/blog/{id}", name="blog_show")
      */
-    public function show(Article $article): Response // 1
+    public function show(Article $article, Request $request, EntityManagerInterface $manager): Response // 1
     {
+
         // ON appel le repository de la classe Article afin de selectionner dans la table Article 
         // $repo = $this->getDoctrine()->getRepository(Article::class);
 
         // La méthode find() issue de la classe ArticleRepository permet de selectionner un article en BDD en fonction de son ID
         // $article = $repo->find($id); // 1
-        dump($article);
+
+        // dump($article);
+
+        $comment = new Comment;
+
+        dump($request);
+        
+
+        $formComment = $this->createForm(CommentType::class, $comment);   // importation du formulaire d'ajout de commentaire relié à l'entité $comment
+        
+        $formComment->handleRequest($request);   // on rempli l'objet (entité) $comment avec les données saisies dans le formulaire
+        
+        // Si le formulaire a bien été validé, on entre dans la condition IF
+        if($formComment->isSubmitted() && $formComment->isValid())
+        {
+            $comment->setCreatedAt(new \DateTime);   // on insère une date de création du commentaire
+            $comment->setArticle($article);   // On relie le commentaire à l'article (clé étrangère)
+
+            $manager->persist($comment);   // on prépare l'insertion
+            $manager->flush();   // on execute l'insertion
+
+            // Envoi d'un message de validation
+            $this->addFlash('success', "Le commentaire a bien été posté !");
+
+            // On redirige vers l'article après l'insertion du commentaire
+            return $this->redirectToRoute('blog_show',[
+                'id' => $article->getId()
+            ]);
+        }
+
+
 
         return $this->render('blog/show.html.twig', [
-            'article' => $article // on envoie sur le template l'article selectionné en BDD
+            'article' => $article,    // on envoie sur le template l'article selectionné en BDD
+            'formComment' => $formComment->createView()
         ]);
     }
 
