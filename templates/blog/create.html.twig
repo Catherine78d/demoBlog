@@ -24,19 +24,20 @@
     {# {{ form(formArticle) }} #}
 
 
-
     {{ form_start(formArticle, { 'attr' : {'class' : 'col-md-7 mx-auto'} }) }}
 
-        {{ form_row(formArticle.title, { 'attr' : {'placeholder' : "Titre de l'article"} }) }}
+        {{ form_row(formArticle.title, { 'attr' : {'placeholder' : "Titre de l'article", 'title': "entre 2 et 50 caractères"}, 'label': "Titre de l'article" }) }}
 
-        {{ form_row(formArticle.content, { 'attr' : {'placeholder' : "Contenu de l'article", "rows": 15} }) }}
+        {{ form_row(formArticle.category, {'label': "Catégorie" }) }}
 
-        {{ form_row(formArticle.image, { 'attr' : {'placeholder' : "URL de l'image"} }) }}
+        {{ form_row(formArticle.content, { 'attr' : {'placeholder' : "Contenu de l'article", "rows": 15}, 'label': "Contenu de l'article" }) }}
+
+        {{ form_row(formArticle.image, { 'attr' : {'placeholder' : "URL de l'image"}, 'label': "URL de l'image" }) }}
 
 
+        <button type="submit" class="btn btn-primary">
         {# editMode est une variable qui est envoyée par le controller, de la fonction form() #}
         {#  Si editMode renvoie TRUE, cele veut dire que l'article possède un ID, donc c'est une modification #}
-        <button type="submit" class="btn btn-primary">
         {% if editMode %}
             Enregistrer les modifications
 

@@ -15,9 +15,56 @@
             <div class="card-body">
                 <p class="card-text"> {{ article.content|raw }} </p>
             </div>
-            <small class="text-muted ml-2 mb-2">publié le {{ article.createdAt|date('d/m/Y') }} à {{ article.createdAt|date('H:i:s') }}</small>
+            <small class="text-muted ml-2 mb-2">publié le {{ article.createdAt|date('d/m/Y') }} à {{ article.createdAt|date('H:i:s') }} de la catégorie <strong>{{ article.category.title }}</strong></small>
             <small> <a href="{{ path('blog_edit', {'id': article.id }) }}" class="btn btn-dark ml-2 mb-2">EDIT</a></small> 
             </div>
+        </div>
+
+        {# Affichage du formulaire d'ajout de commentaire envoyé par le controller BlogController #}
+        <h4 class="mt-5 mb-3"> Donner votre avis ... </h4>
+
+        {#  On passe en revue les messages utilisateurs stockés en session dans la variable d'environnement 'app'  #}
+        {#  flashes('success') permet d'avoir accès à tout les messages utilisateurs, 'success' est un identifiant de message définit dans le controler  #}
+        {% for message in app.flashes('success') %}
+
+            <div class="col-md-7 bg-success p-3 rounted mx-auto text-center text-white">
+                {{ message }}
+            </div>
+
+        {% endfor %} 
+
+        {#  Affichage du formulaire d'ajout de commentaire envoyé par le controller BlogController #}
+        {{ form_start(formComment) }}
+
+            {{ form_row(formComment.author, {'label': "Nom d'utilisateur" }) }}
+
+            {{ form_row(formComment.content, {'label': "Saisir votre commentaire" }) }}
+
+            <button type="submit" class="btn btn-dark">Poster le commentaire</button> 
+        
+        {{ form_end(formComment) }}
+
+
+        <h4 class="mt-5 mb-3"> Vos réactions ... </h4>
+
+        <div class="row mb-5">
+        {# Grace aux relations bi-directionnelle, lorsque nous selectionnons un article en BDD, Symphony sélectionne dans le même temps toutes les informations liées à l'article dans les autres tables (si il y a une relation entre les tables) #}
+        {# Nous avons donc automatiquement accès aux commentaires liés à l'article #}
+        {# data réceptionne une ligne commentaire par tour de boucle #}
+
+            {% for  data in article.comments %}
+
+                <div class="col-md-4 border py-2"> 
+                    <span><strong> {{ data.author }} </strong></span>
+                    <small class="font-italic">Posté le {{ data.createdAt|date('d/m/Y') }} à {{ data.createdAt|date ('H:i:s') }} </small>
+                </div>
+                
+                <div class="col-md-8 border py-2"> 
+                    {{ data.content|striptags }}
+                </div>
+
+
+            {% endfor %} 
         </div>
 
     </div>
