@@ -25,31 +25,72 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href=" {{ path('security_registration') }}">Créer votre compte </a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href=" {{ path('blog') }}">Blog <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href=" {{ path('blog_create') }}">Ajouter un article </a>
-                    </li>
-                    <li class="nav-item dropdown">
+
+                    {# app est une variable qui contient beaucoup de variables d'environnement et notamment les informations d'un membre connecté accessible via 'app.user' #}
+                    {# Si l'internaute n'est pas connecté, on lui propose de s'inscrire ou de se connecter #}
+                    {% if not app.user %}
+                        <li class="nav-item active">
+                            <a class="nav-link" href=" {{ path('security_login') }}">Identifiez-vous </a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href=" {{ path('security_registration') }}">Créer votre compte </a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href=" {{ path('blog') }}">Blog <span class="sr-only">(current)</span></a>
+                        </li>
+                    {% endif %}
+
+
+                    {# Si l'internaute est connecté, il a la possibilité de créer un nouvel article #}
+                    {% if app.user %}
+                        <li class="nav-item active">
+                            <a class="nav-link" href=" {{ path('blog_create') }}">Ajouter un article </a>
+                        </li>
+                    {% endif %}
+
+
+                    {# <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Dropdown
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">ActionBlog1</a>
-                            <a class="dropdown-item" href="#">ActionBlog2</a>
-                            <a class="dropdown-item" href="#">ActionBlog3</a>
+                            <a class="dropdown-item" href="#">Rock</a>
+                            <a class="dropdown-item" href="#">Jazz</a>
+                            <a class="dropdown-item" href="#">Classique</a>
                         </div>
-                    </li>
+                    </li> #}
+
+                    {# Si l'internaute a bien un role définit ROLE_ADMIN dans la BDD, alors on lui donne accès au lien BACKOFFICE #}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            BACK OFFICE
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ path('admin') }}">Accueil BACK OFFICE</a>
+                                <a class="dropdown-item" href="#">Gestion des articles</a>
+                                <a class="dropdown-item" href="#">Gestion des membres</a>
+                                <a class="dropdown-item" href="#">Gestion des commentaires</a>
+                                <a class="dropdown-item" href="#">Gestion des catégories</a>
+                            </div>
+                        </li>
+                    {% endif %}
+
+                    {#  Si l'internaute est connecté, on lui propose le lien de déconnexion #}
+                    {% if app.user %}
+                        <li class="nav-item active">
+                            <a class="nav-link" href=" {{ path('security_logout') }}">Déconnexion </a>
+                        </li>
+                    {% endif %}
                 </ul>
                 <form class="form-inline my-2 my-lg-0">
                     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                 </form>
             </div>
         </nav>
+
+                        
+        {{ dump(app.user) }}
 
         <div class="container mon-conteneur">
         {% block body %}
