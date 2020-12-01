@@ -21,11 +21,11 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/admin/articles), name="admin_articles")
+     * @Route("/admin/articles", name="admin_articles")
      */
-    public function adminArticles()
+    public function adminArticles(): Response
     {
         return $this->render('admin/admin_articles.html.twig');
     }
-    
+
 }
