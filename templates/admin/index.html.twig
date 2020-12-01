@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MonBlog Symfony | BACK OFFICE{% endblock %}
+
+{% block body %}
+
+    <h1 class="display-4 text-center my-4">BACK OFFICE</h1>
+
+    <h4 class="text-center pb-5">Bienvenue <span class="text-info"> {{ app.user.username }} </span> dans votre BACK OFFICE</h4>
+
+    <a href="" class="col-md-6 offset-md-3 btn bbtn-dark p-3 mb-2">GESTION DES ARTICLES </a>
+
+    <a href="" class="col-md-6 offset-md-3 btn bbtn-dark p-3 mb-2">GESTION DES CATEGORIES </a>
+
+    <a href="" class="col-md-6 offset-md-3 btn bbtn-dark p-3 mb-2">GESTION DES COMMENTAIRES </a>
+
+    <a href="" class="col-md-6 offset-md-3 btn bbtn-dark p-3 mb-2">GESTION DES MEMBRES </a>
+
+{% endblock %}
