@@ -10,7 +10,7 @@
     {# error : variable TWIG qui provient du controller SecurityController et qui contient un message d'erreur en cas de mauvaise connexion #}
     {% if error %}
 
-        <p class="bg-danger text-white text-center p-3 col-md-4 mx-auto rounded">
+        <p class="bg-danger text-white text-center p-3 col-md-3 mx-auto rounded">
             {{ error.messagekey|trans(error.messageData, 'security') }}
             {# trans(error.messageData, 'security') : permet de pointer sur le fichier 'translation/security.en.php' qui contient la personnalisation des messages utilisateurs par défaut de Symfony #}
         </p>
