@@ -161,8 +161,10 @@ class BlogController extends AbstractController
 
         $comment = new Comment;
 
-        dump($request);
+        // dump($request);
         
+        // $user = $this->getUser()->getUsername();
+        // dump($user);
 
         $formComment = $this->createForm(CommentType::class, $comment);   // importation du formulaire d'ajout de commentaire relié à l'entité $comment
         
@@ -171,8 +173,16 @@ class BlogController extends AbstractController
         // Si le formulaire a bien été validé, on entre dans la condition IF
         if($formComment->isSubmitted() && $formComment->isValid())
         {
+            // getUser() : permettant de récupérer les données de l'utilisateur en session
+            // On stock le nom d'utilisateur dans la variable ¤username
+            $username = $this->getUser()->getUsername();
+            dump($username);
+
+            // On renseigne le setter de l'auteur afin qu'il soit automatiquement compris dans le commentaire
+            $comment->setAuthor($username);
             $comment->setCreatedAt(new \DateTime);   // on insère une date de création du commentaire
             $comment->setArticle($article);   // On relie le commentaire à l'article (clé étrangère)
+
 
             $manager->persist($comment);   // on prépare l'insertion
             $manager->flush();   // on execute l'insertion
@@ -190,7 +200,8 @@ class BlogController extends AbstractController
 
         return $this->render('blog/show.html.twig', [
             'article' => $article,    // on envoie sur le template l'article selectionné en BDD
-            'formComment' => $formComment->createView()
+            'formComment' => $formComment->createView(),
+            
         ]);
     }
 
@@ -200,5 +211,5 @@ class BlogController extends AbstractController
         Nous avons donc des fonctions beaucoup plus courte !!
     */
 
-   
+
 }

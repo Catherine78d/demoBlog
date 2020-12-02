@@ -7,7 +7,7 @@
 
 {#  "article" est une variable TWIG qui provient du controller et qui contient le détail d'un article selectionné en BDD #}
 <h1 class="display-4 text-center my-4"> {{ article.title }}</h1>
-
+<div class="container">
     <div class="col-md-12">
         <div class="card mb-4 shadow-sm">
             {#  replace() : filtre TWIG permettant de remplacer la hauteur/largeur dans l'URL de l'image #}
@@ -16,33 +16,44 @@
                 <p class="card-text"> {{ article.content|raw }} </p>
             </div>
             <small class="text-muted ml-2 mb-2">publié le {{ article.createdAt|date('d/m/Y') }} à {{ article.createdAt|date('H:i:s') }} de la catégorie <strong>{{ article.category.title }}</strong></small>
-            <small> <a href="{{ path('blog_edit', {'id': article.id }) }}" class="btn btn-dark ml-2 mb-2">EDIT</a></small> 
+            
+            {#  Si l'utilisateur possède un compte admin (ROLE_ADMIN), on lui donne la possibilité de modifier l'article #}
+            {% if is_granted('ROLE_ADMIN') %}
+                <small> <a href="{{ path('blog_edit', {'id': article.id }) }}" class="btn btn-dark ml-2 mb-2">EDIT</a></small> 
+            {% endif %}  
+
             </div>
         </div>
 
         {# Affichage du formulaire d'ajout de commentaire envoyé par le controller BlogController #}
-        <h4 class="mt-5 mb-3"> Donner votre avis ... </h4>
 
-        {#  On passe en revue les messages utilisateurs stockés en session dans la variable d'environnement 'app'  #}
-        {#  flashes('success') permet d'avoir accès à tout les messages utilisateurs, 'success' est un identifiant de message définit dans le controler  #}
-        {% for message in app.flashes('success') %}
+        {# Si l'internaute est bien connecté, donc possède un role ROLE_USER en BDD, on entre dans la condition IF et il a la possibilité de poster un commentaire #}
+        {% if is_granted('ROLE_USER') %}
 
-            <div class="col-md-7 bg-success p-3 rounted mx-auto text-center text-white">
-                {{ message }}
-            </div>
+            {#  On passe en revue les messages utilisateurs stockés en session dans la variable d'environnement 'app'  #}
+            {#  flashes('success') permet d'avoir accès à tout les messages utilisateurs, 'success' est un identifiant de message définit dans le controler  #}
+            {% for message in app.flashes('success') %}
 
-        {% endfor %} 
+                <div class="col-md-7 bg-success p-3 rounted mx-auto text-center text-white">
+                    {{ message }}
+                </div>
 
-        {#  Affichage du formulaire d'ajout de commentaire envoyé par le controller BlogController #}
-        {{ form_start(formComment) }}
+            {% endfor %} 
 
-            {{ form_row(formComment.author, {'label': "Nom d'utilisateur" }) }}
+            <h4 class="mt-5 mb-3"> Donner votre avis ... </h4>
 
-            {{ form_row(formComment.content, {'label': "Saisir votre commentaire" }) }}
+            {#  Affichage du formulaire d'ajout de commentaire envoyé par le controller BlogController #}
+            {{ form_start(formComment) }}
 
-            <button type="submit" class="btn btn-dark">Poster le commentaire</button> 
-        
-        {{ form_end(formComment) }}
+                {# {{ form_row(formComment.author, {'label': "Nom d'utilisateur" }) }} #}
+
+                {{ form_row(formComment.content, {'label': "Saisir votre commentaire" }) }}
+
+                <button type="submit" class="btn btn-dark">Poster le commentaire</button> 
+
+            {{ form_end(formComment) }}
+
+        {% endif %}  
 
 
         <h4 class="mt-5 mb-3"> Vos réactions ... </h4>
@@ -69,5 +80,5 @@
 
     </div>
 
-
+</div>
 {% endblock %}
