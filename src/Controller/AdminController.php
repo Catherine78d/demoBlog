@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\Category;
 use App\Form\ArticleType;
+use App\Form\CategoryType;
 use App\Repository\ArticleRepository;
+use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,7 +56,7 @@ class AdminController extends AbstractController
      * @Route("/admin/article/new", name="admin_new_article")
      * @Route("/admin/{id}/edit-article", name="admin_edit_article")
      */
-    public function adminForm(Request $request, EntityManagerInterface $manager, Article $article = null): Response
+    public function adminFormArticle(Request $request, EntityManagerInterface $manager, Article $article = null): Response
     {
         /*
             1. Importer le formulaire de création des articles (form/aricleType)
@@ -96,8 +99,115 @@ class AdminController extends AbstractController
         }
 
         return $this->render('admin/admin_create.html.twig', [
-            'formArticle' => $formArticle->CreateView()
+            'formArticle' => $formArticle->CreateView(),
+            'editMode' => $article->getId()
         ]);
     }
+
+    /**
+     * @Route("admin/{id}/delete-article", name="admin_delete_article")
+     */
+    public function deleteArticle(Article $article, EntityManagerInterface $manager)
+    {
+        // Nous avons définit une route paramétrée (id) afin de pouvoir supprimer cet article dans la BDD
+        // Nous avons injecté en dépendance l'entité article afin que Symfony selectionne auutomatiquement en BDD l'article à supprimer
+        // remove() : méthode de l'interface EntityManagerInterface qui permet de préparer et garder en mémoire la requête DELETE de suppression
+        $manager->remove($article);
+        $manager->flush();
+
+        // On affiche un message de validation de suppression
+        $this->addFlash('success', "L'article a bien été supprimé");
+
+        // On redirige vers l'affichage des articles dans le backoffice après la suppression
+        return $this->redirectToRoute('admin_articles');
+    }
+
+    /**
+     * @Route("/admin/category", name="admin_category")
+     */
+    public function  adminCategory(EntityManagerInterface $manager, CategoryRepository $repo): Response
+    {
+        $colonnes = $manager->getclassMetadata(Category::class)->getFieldNames();
+
+        dump($colonnes);
+
+        $categories = $repo->findAll();  // SELECT * FROM category + FETCH_ALL (retour des array multidimentionnel)
+
+        dump($categories);
+
+        return $this->render('admin/admin_category.html.twig', [
+            'colonnes' => $colonnes,
+            'categories' => $categories
+            ]);
+    }
+
+    /**
+     * @Route("/admin/category/new", name="admin_new_category")
+     * @Route("/admin/{id}/edit-category", name="admin_edit_category")
+     */
+    public function adminFormCategory(Request $request, EntityManagerInterface $manager, Category $category = null): Response
+    {
+        // L'entité Category représente un model de la table SQL Category, donc pour pouvoir insérer dans la table Category, nous devons renseigner les setter de l'objet avec les données du formulaire
+        if (!$category) 
+        {
+            $category = new Category;
+        }
+
+        $formCategory = $this->createForm(CategoryType::class, $category);   // On crée le formulaire d'ajout/modif des catégories eet on relit le formulaire à l'entité $category
+
+        dump($request);
+
+        $formCategory->handleRequest($request); // on récupère les données du formulaire afin de les envoyer dans les setteurs de l'entité $category
+
+        if($formCategory->isSubmitted() && $formCategory->isValid())
+        {
+            if(!$category->getId())
+                $message = "La catégorie a bien été enregistrée";
+            else
+                $message = "La catégorie a bien été modifiée";
+
+            // Message de validation
+            $this->addFlash('success', $message);
+
+            $manager->persist($category);   // on prépare et on garde en mémoire l'insertion
+            $manager->flush();   // on execute l'insertion      
+
+            // On redirige vers l'affichage des catégories dans le backoffice après l'enregistrement'
+            return $this->redirectToRoute('admin_category');
+
+        }
+
+        return $this->render('admin/admin_create_category.html.twig', [
+            'formCategory' => $formCategory->createView(),
+            'editMode' => $category->getId()
+        ]);
+    }
+
+
+
+    /**
+     * @Route("admin/{id}/delete-category", name="admin_delete_category")
+     */
+    public function adminDeleteCategoty(Category $category, EntityManagerInterface $manager)
+    {
+        // Si le getter getArticles() est vide, cela veut dire qu'il n'y a plus d'articles associés à la catégorie, nous pouvons donc la supprimer
+        if($category->getArticles()->isEmpty())
+        {
+            $manager->remove($category);
+            $manager->flush();
+
+            // On affiche un message de validation de suppression
+            $this->addFlash('success', "La categorie a bien été supprimée");
+        }
+        else  // Sinon dans tous les autres cas, cela veut dire que des articles sont encore associés à la catégorie, nous ne pouvons donc pas la supprimer
+        {
+            // On affiche un message de validation de suppression
+            $this->addFlash('danger', "Il n'est pas possible de supprimer la catégorie car des articles y sont toujours associés ");
+        }
+
+        // On redirige vers l'affichage des categories dans le backoffice après la suppression
+        return $this->redirectToRoute('admin_category');
+    }
+
 
 }

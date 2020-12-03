@@ -50,7 +50,7 @@
                 <td class="align-middle"> {{ data.category.title }} </td>
 
                 <td class="align-middle"><a href="{{ path('admin_edit_article', {'id': data.id }) }}" class="btn btn-dark text-white"><i class="fas fa-edit fa-1x"></i></a></td>
-                <td class="align-middle"><a href="" class="btn btn-danger text-white"><i class="fas fa-trash fa-1x"> </td>
+                <td class="align-middle"><a href="{{ path('admin_delete_article', {'id': data.id }) }}" class="btn btn-danger text-white" onclick="return(confirm('Voulez-vous vraiment supprimer cet article ?'))"><i class="fas fa-trash fa-1x"> </td>
             </tr>
 
             {# <tr>
