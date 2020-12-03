@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BACK OFFICE | Gestion des catégories{% endblock %}
+
+{% block body %}
+
+    <h1 class="display-4 text-center my-4">
+        {% if editMode %}
+            BACK OFFICE | Modification de la catégorie
+
+        {%  else %}
+            BACK OFFICE | Création d'une catégorie
+        
+        {% endif %}  
+
+    <small><a href=" {{ path('admin_category') }}" class="btn btn-dark btn-sm">retour</a></small>
+    </h1>
+
+
+
+    {{ form_start(formCategory, { 'attr' : {'class' : 'col-md-5 mx-auto'} }) }}
+
+        {{ form_row(formCategory.title, { 'attr' : {'placeholder' : "Titre de la categorie", 'title': "entre 2 et 50 caractères"}, 'label': "Titre de la categorie" }) }}
+
+        {{ form_row(formCategory.description, { 'attr' : {'placeholder' : "Contenu de la categorie", "rows": 10}, 'label': "Contenu de la categorie" }) }}
+
+        {# editMode est une variable qui provient du controller adminController et qui retourne l'ID d'une catégorie #}
+        <button type="submit" class="btn btn-dark">
+
+        {#  Si editMode retourne TRUE, cela veut dire que la catégorie possède un ID, c'est donc une modification #}
+        {% if editMode %}
+            Enregistrer les modifications
+
+        {# sinon dans tous les autres cas, la categorie ne possède pas d'ID, c'est une insertion  #}
+        {%  else %}
+            Enregistrer la catétorie
+        
+        {% endif %}
+        </button>
+
+    {{ form_end(formCategory) }}
+
+{% endblock %}  
