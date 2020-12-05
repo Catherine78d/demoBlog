@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BACK OFFICE | Modification du Commentaire{% endblock %}
+
+{% block body %}
+
+    <h1 class="display-4 text-center my-4">BACK OFFICE | Modification du commentaire</h1>
+
+{{ form_start(formComment, {'attr': {'class': 'col-md-7 mx-auto'}}) }}
+
+    {{ form_row(formComment.author, {'label': "Auteur"}) }}
+
+    {{ form_row(formComment.article) }}
+
+    {{ form_row(formComment.content, {'attr': {'rows':15}, 'label': "Contenu du commentaire"}) }}
+
+    {{ form_row(formComment.createdAt, {'label': "Date"}) }}
+
+    <button type="submit" class="btn btn-dark">Enregistrer les modifications</button> 
+
+{{ form_end(formComment) }}
+
+{% endblock %}  

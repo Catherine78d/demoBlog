@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BACK OFFICE | Modification membre{% endblock %}
+
+{% block body %}
+
+<div class="container">
+
+    <h1 class="display-4 text-center my-4">BACK OFFICE | Modification membre</h1>
+
+    {{ form_start(formUser, {'attr': {'class': 'col-md-5 mx-auto'}}) }}
+    
+        {{ form_row(formUser.username, {'label': "Nom d'utilisateur"}) }}
+    
+        {{ form_row(formUser.email, {'label': "Email"}) }}
+    
+        {{ form_row(formUser.roles, {'label': false}) }}
+    
+        <button type="submit" class="btn btn-dark">Enregistrer les modifications</button> 
+    
+    {{ form_end(formUser) }}
+
+</div>
+
+{% endblock %}  

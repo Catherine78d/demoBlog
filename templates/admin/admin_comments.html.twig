@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BACK OFFICE | Gestion des Commentaires{% endblock %}
+
+{% block body %}
+
+    <h1 class="display-4 text-center my-4">BACK OFFICE | Gestion des Commentaires</h1>
+
+    {% for message in app.flashes('success') %}
+
+        <div class="bg-success text-white text-center col-md-4 mx-auto rountded p-3 mb-3">
+        {{ message }}
+        </div>
+
+    {% endfor %}
+
+
+    <table class="table table-bordered text-center">
+
+        <tr>
+            {# <th>CATEGORIE</th> #}
+            <th>TITRE DE L'ARTICLE</th>
+            {% for data in colonnes %}
+
+                {% if data == 'createdAt' %}
+
+                    <th>DATE</th>
+
+                {% else %}
+
+                    {#  upper : filtre TWIG afin d'afficher le nom des colonnes en majuscules #}
+                    <th> {{ data|upper }}</th>
+
+                {% endif %}
+
+
+            {% endfor %}
+
+                <th>EDIT</th>
+                <th>SUPP</th>
+        </tr>
+
+        {% for data in comments %}
+
+            <tr>
+                {# <td class="align-middle"> {{ data.category.title }} </td> #}
+                <td class="align-middle"> {{ data.article.title }} </td>
+                <td class="align-middle"> {{ data.id }} </td>
+                <td class="align-middle"> {{ data.author }} </td>
+                <td class="align-middle"> {{ data.content|striptags }} </td>
+                <td class="align-middle"> {{ data.createdAt|date('d/m/Y à H:i:s') }} </td>
+
+                <td class="align-middle"><a href="{{ path('admin_edit_comment', {'id': data.id }) }}" class="btn btn-dark text-white"><i class="fas fa-edit fa-1x"></i></a></td>
+                <td class="align-middle"><a href="{{ path('admin_delete_comment', {'id': data.id }) }}" class="btn btn-danger text-white" onclick="return(confirm('Voulez-vous vraiment supprimer ce commentaire ?'))"><i class="fas fa-trash fa-1x"> </td>
+            </tr>
+
+        {% endfor %}
+
+    </table>
+
+{% endblock %}  

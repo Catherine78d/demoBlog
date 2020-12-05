@@ -2,11 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\Article;
+use App\Entity\Comment;
 use App\Entity\Category;
 use App\Form\ArticleType;
 use App\Form\CategoryType;
+use App\Form\AdminCommentType;
+use App\Repository\UserRepository;
+use App\Form\AdminRegistrationType;
 use App\Repository\ArticleRepository;
+use App\Repository\CommentRepository;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -207,6 +213,141 @@ class AdminController extends AbstractController
 
         // On redirige vers l'affichage des categories dans le backoffice après la suppression
         return $this->redirectToRoute('admin_category');
+    }
+
+
+
+    /**
+     * @Route("/admin/comments", name="admin_comments")
+     */
+    public function adminComments(EntityManagerInterface $manager, CommentRepository $repo): Response
+    {
+        $colonnes = $manager->getclassMetadata(Comment::class)->getFieldNames();
+
+        dump($colonnes);
+
+        $comments = $repo->findAll();  // SELECT * FROM comment + FETCH_ALL (retour des array multidimentionnel)
+
+        dump($comments);
+
+        return $this->render('admin/admin_comments.html.twig', [
+            'colonnes' => $colonnes,
+            'comments' => $comments
+            ]); 
+    }
+
+    /**
+     * @Route("/admin/{id}/edit-comment", name="admin_edit_comment")
+     */
+    public function editComment(Comment $comment, Request $request, EntityManagerInterface $manager): Response
+    {
+        dump($comment);
+        
+        $formComment = $this->createForm(AdminCommentType::class, $comment);
+        
+        dump($request);
+        $formComment->handleRequest($request);
+        
+        if($formComment->isSubmitted() && $formComment->isValid())
+        {
+            $manager->persist($comment);
+            // $insert = $bdd->prepare("INSERT INTO comment (author) VALUES (:author)");
+            // $insert->bindValue(':author')
+
+            $manager->flush();
+            // $insert->execute();
+
+            $this->addFlash('success', "Le commentaire a bien été modifié");
+
+            return $this->redirectToRoute('admin_comments');
+
+        }
+
+        return $this->render('admin/edit_comment.html.twig', [
+            'formComment' => $formComment->createView()
+        ]);
+    }
+
+
+    /**
+     * @Route("admin/{id}/delete-comment", name="admin_delete_comment")
+     */
+    public function adminDeleteComment(Comment $comment, EntityManagerInterface $manager)
+    {
+        $manager->remove($comment);   // Préparation de la requête DELETE
+        $manager->flush();   // execution de la requete DELETE
+
+        // Message de validation de suppression
+        $this->addFlash('success', "Le commentaire a bien été supprimée");
+
+        // redirection vers l'affichage des commentaires dans le BACKOFFICE
+        return $this->redirectToRoute('admin_comments');
+    }
+
+
+
+
+
+    /**
+     * @Route("/admin/users", name="admin_users")
+     */
+    public function adminUserss(EntityManagerInterface $manager, UserRepository $repo): Response
+    {
+        $colonnes = $manager->getclassMetadata(User::class)->getFieldNames();
+
+        dump($colonnes);
+
+        $users = $repo->findAll();  // SELECT * FROM user + FETCH_ALL (retour des array multidimentionnel)
+
+        dump($users);
+
+        return $this->render('admin/admin_users.html.twig', [
+            'colonnes' => $colonnes,
+            'users' => $users
+            ]); 
+    }
+
+    
+    /**
+     * @Route("/admin/{id}/edit_user", name="admin_edit_user")
+     */
+    public function editUser(User $user, Request $request, EntityManagerInterface $manager): Response
+    {
+        dump($user);
+
+        $formUser = $this->createForm(AdminRegistrationType::class,$user);
+
+        $formUser->handleRequest($request);
+
+        if($formUser->isSubmitted() && $formUser->isValid())
+        {
+            $manager->persist($user);
+            $manager->flush();
+
+            $this->addFlash('success', "L'utilisateur a bien été modifié");
+
+            return $this->redirectToRoute('admin_users');
+        }
+
+        return $this->render('admin/edit_user.html.twig', [
+            'formUser' => $formUser->createView()
+        ]);
+    }
+
+    
+    /**
+     * @Route("admin/{id}/delete-user", name="admin_delete_user")
+     */
+    public function adminDeleteUser(User $user, EntityManagerInterface $manager)
+    {
+        $manager->remove($user);   // Préparation de la requête DELETE
+        $manager->flush();   // execution de la requete DELETE
+
+        // Message de validation de suppression
+        $this->addFlash('success', "L'utilisateur a bien été supprimé");
+
+        // redirection vers l'affichage des utilisateurs dans le BACKOFFICE
+        return $this->redirectToRoute('admin_users');
     }
 
 
