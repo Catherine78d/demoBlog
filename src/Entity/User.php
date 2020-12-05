@@ -13,6 +13,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @UniqueEntity(
  *      fields = {"email"},
  *      message="Un compte est déjà existant à cette adresse Email"
+ * 
+ *      
  * )
  *  @UniqueEntity(
  *      fields = {"username"},
@@ -32,6 +34,8 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="Veuillez renseigner un Email")
      * @Assert\Email(message="Veuillez saisir une adresse Email valide")
+     * 
+     * 
      */
     private $email;
 
@@ -42,6 +46,7 @@ class User implements UserInterface
      *      minMessage="Votre mon d'utilisateur doit contenir minimum 2 caratères"
      * )
      * @Assert\NotBlank(message="Veuillez renseigner un nom d'utilisateur")
+     * 
      */
     private $username;
 
@@ -53,7 +58,8 @@ class User implements UserInterface
      * )
      * @Assert\EqualTo(
      *      propertyPath="confirm_password",
-     *      message="Les mots de passe ne correspondent pas"
+     *      message="Les mots de passe ne correspondent pas",
+     *      groups={"registration"}
      * )
      */
     private $password;
@@ -61,7 +67,8 @@ class User implements UserInterface
     /**
     * @Assert\EqualTo(
     *      propertyPath="password",
-    *      message="Les mots de passe ne correspondent pas"
+    *      message="Les mots de passe ne correspondent pas",
+    *      groups={"registration"}
     * )
     */
     public $confirm_password;
